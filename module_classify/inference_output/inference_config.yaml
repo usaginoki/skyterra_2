@@ -1,0 +1,69 @@
+data:
+  class_path: MultiTemporalCropClassificationDataModule
+  init_args:
+    bands:
+    - BLUE
+    - GREEN
+    - RED
+    - NIR_NARROW
+    - SWIR_1
+    - SWIR_2
+    expand_temporal_dimension: true
+    reduce_zero_label: true
+    use_metadata: true
+model:
+  class_path: terratorch.tasks.SemanticSegmentationTask
+  init_args:
+    class_weights:
+    - 0.386375
+    - 0.661126
+    - 0.548184
+    - 0.640482
+    - 0.876862
+    - 0.925186
+    - 3.249462
+    - 1.542289
+    - 2.175141
+    - 2.272419
+    - 3.062762
+    - 3.626097
+    - 1.198702
+    freeze_backbone: false
+    freeze_decoder: false
+    ignore_index: -1
+    loss: ce
+    model_args:
+      backbone: <prithvi_model>
+      backbone_bands:
+      - BLUE
+      - GREEN
+      - RED
+      - NIR_NARROW
+      - SWIR_1
+      - SWIR_2
+      backbone_coords_encoding:
+      - time
+      - location
+      backbone_num_frames: 3
+      backbone_pretrained: true
+      decoder: UperNetDecoder
+      decoder_channels: 256
+      head_dropout: 0.1
+      necks:
+      - indices:
+        - 2
+        - 5
+        - 8
+        - 11
+        name: SelectIndices
+      - effective_time_dim: 3
+        name: ReshapeTokensToImage
+      num_classes: 13
+      rescale: true
+    model_factory: EncoderDecoderFactory
+    tiled_inference_parameters:
+      average_patches: true
+      h_crop: 224
+      h_stride: 112
+      w_crop: 224
+      w_stride: 112

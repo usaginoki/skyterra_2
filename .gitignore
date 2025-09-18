@@ -1,0 +1,8 @@
+# Ignore all data directories
+**/data/
+
+# Ignore model checkpoints
+*.ckpt
+*.pt
+*.pth
+*.h5
