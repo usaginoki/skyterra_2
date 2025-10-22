@@ -19,11 +19,11 @@ def main():
     
     # Configuration and checkpoint paths
     config_file = base_dir / "multicrop.yaml"
-    checkpoint_path = base_dir / "multicrop_example" / "multicrop_augmented_example" / "checkpoints" / "best-checkpoint-epoch=48-val_loss=0.00.ckpt"
+    checkpoint_path = base_dir / "multicrop_example" / "multicrop_example" / "checkpoints" / "best-checkpoint-epoch=42-val_loss=0.00.ckpt"
     
     # Example input and output directories
     input_dir = base_dir.parent / "data"
-    output_dir = base_dir / "inference_output_aug"
+    output_dir = base_dir / "inference_output"
     
     print("=== Quick Multicrop Inference (TerraTorch Style) ===")
     print(f"Config: {config_file}")

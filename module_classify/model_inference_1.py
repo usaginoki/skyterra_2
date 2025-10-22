@@ -181,6 +181,7 @@ def run_inference_directory(input_dir: str, output_dir: str, config_file: str, c
     # Use the TerraTorch inference_on_dir method
     try:
         predictions = []
+        original_predictions = []
         file_names = []
         def model_forward(x,  **kwargs):
             return model(x, **kwargs).output 
@@ -218,9 +219,11 @@ def run_inference_directory(input_dir: str, output_dir: str, config_file: str, c
                 print(f"Raw prediction shape: {prediction.shape}")
                 # Create 2D image where each pixel contains the MAXIMUM VALUE from the 13 layers
                 # prediction shape: (13, height, width) -> max_values shape: (height, width)
+                prediction_original = prediction[0]  # Original tensor structure (13, H, W)
+                print(f"Original prediction shape: {prediction_original.shape}")
                 prediction_max_values = prediction[0].max(dim=0)[1]  # [0] gets values, [1] would get indices
                 print(f"Max values prediction shape: {prediction_max_values.shape}")
-                
+                original_predictions.append(prediction_original)  # Original tensor structure
                 predictions.append(prediction_max_values)  # 2D maximum values
                 file_names.append(input_file)
             except Exception as e:
@@ -234,6 +237,7 @@ def run_inference_directory(input_dir: str, output_dir: str, config_file: str, c
     for pred, input_file in zip(predictions, file_names):
         base_name = os.path.splitext(os.path.basename(input_file))[0]
         
+       
         # Save prediction as TIFF (2D max values from all layers)
         output_file = os.path.join(output_dir, f"{base_name}_pred.tif")
         save_max_values_prediction(pred, input_file, output_file)
@@ -245,6 +249,14 @@ def run_inference_directory(input_dir: str, output_dir: str, config_file: str, c
                 create_visualization_terratorch_style(input_file, pred, output_dir, base_name)
             except Exception as e:
                 print(f"Warning: Could not create visualization for {base_name}: {e}")
+                
+    for pred, input_file in zip(original_predictions, file_names):
+        base_name = os.path.splitext(os.path.basename(input_file))[0]
+        
+        # save predictions as tiff (original tensor structure)
+        output_file = os.path.join(output_dir, f"{base_name}_pred_full_original.tif")
+        save_prediction(pred, input_file, output_file)
+        print(f"Saved original full prediction: {output_file}")
     
     print("Inference completed!")
 
