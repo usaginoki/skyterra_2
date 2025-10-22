@@ -1,3 +1,6 @@
 data/
 
 *.log
+
+inference_output/
+inference_output_aug/
